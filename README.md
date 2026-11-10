@@ -118,6 +118,145 @@ flowchart LR
 | `grafos` | `GrafoMixto` guarda vértices, conexiones y la lista de adyacencia; `RepresentacionesGrafo` construye y muestra las tres representaciones. |
 | `algoritmos` | `BusquedaAnchura`, `BusquedaProfundidad` y `SolucionDijkstra`: cada uno recibe el `GrafoMixto` por constructor. |
 
+### Diagrama de clases
+
+```mermaid
+classDiagram
+    class Vertice {
+        -String id
+        -String etiqueta
+        -String tipo
+        +getId() String
+        +getEtiqueta() String
+        +getTipo() String
+        +compareTo(Vertice) int
+    }
+    class Conexion {
+        -String id
+        -String origen
+        -String destino
+        -boolean dirigida
+        -int peso
+        -String etiqueta
+        +getId() String
+        +getOrigen() String
+        +getDestino() String
+        +esDirigida() boolean
+        +getPeso() int
+        +getEtiqueta() String
+    }
+    class GrafoMixto {
+        -Map~String,Vertice~ vertices
+        -Map~String,Conexion~ conexiones
+        -Map~String,List~Conexion~~ listaAdyacencia
+        +agregarVertice(Vertice)
+        +eliminarVertice(String)
+        +agregarConexion(Conexion)
+        +eliminarConexion(String)
+        +bloquearConexion(String)
+        +obtenerVertice(String) Vertice
+        +obtenerVertices() Collection~Vertice~
+        +obtenerConexiones() Collection~Conexion~
+        +obtenerVecinos(String) List~Conexion~
+        +existeVertice(String) boolean
+        +existeConexion(String) boolean
+        +getNumeroVertices() int
+        +getNumeroConexiones() int
+    }
+    class RepresentacionesGrafo {
+        -GrafoMixto grafo
+        +obtenerListaAdyacencia() Map
+        +obtenerMatrizAdyacencia() int[][]
+        +obtenerMatrizIncidencia() int[][]
+        +imprimirListaAdyacencia()
+        +imprimirMatrizAdyacencia()
+        +imprimirMatrizIncidencia()
+    }
+    class BusquedaAnchura {
+        -GrafoMixto grafo
+        +recorrer(String) List~String~
+        +construirArbolBFS(String) Map
+    }
+    class BusquedaProfundidad {
+        -GrafoMixto grafo
+        +recorrer(String) List~String~
+        +detectarCiclos() boolean
+        +encontrarComponentesDebiles() List~Set~
+    }
+    class SolucionDijkstra {
+        -GrafoMixto grafo
+        +calcularDistancias(String) Map
+        +encontrarRutaMinima(String, String) ResultadoDijkstra
+    }
+    class ResultadoDijkstra {
+        -List~String~ camino
+        -int distanciaTotal
+        +getCamino() List~String~
+        +getDistanciaTotal() int
+        +tieneCamino() boolean
+    }
+    class NodoArbol~T~ {
+        -T dato
+        -NodoArbol izquierdo
+        -NodoArbol derecho
+        -int altura
+    }
+    class ArbolBinarioBusqueda~T~ {
+        #NodoArbol raiz
+        #int tamanio
+        #BiFunction comparador
+        #int pasosBusqueda
+        +insertar(T)
+        +buscar(T) boolean
+        +eliminar(T)
+        +inOrder() List~T~
+        +preOrder() List~T~
+        +postOrder() List~T~
+        +altura() int
+        +getPasosBusqueda() int
+        +getTamanio() int
+        +estaVacio() boolean
+    }
+    class ArbolAVL~T~ {
+        +insertar(T)
+        +eliminar(T)
+        -rotarDerecha(NodoArbol) NodoArbol
+        -rotarIzquierda(NodoArbol) NodoArbol
+        -obtenerBalance(NodoArbol) int
+    }
+    class FabricaDatos {
+        +crearGrafoRedSegura() GrafoMixto$
+    }
+    class AplicacionRedSegura {
+        -GrafoMixto grafo
+        -ArbolBinarioBusqueda abb
+        -ArbolAVL avl
+        -Scanner scanner
+        +ejecutar()
+        +main(String[])$
+    }
+
+    AplicacionRedSegura --> GrafoMixto
+    AplicacionRedSegura --> ArbolBinarioBusqueda
+    AplicacionRedSegura --> ArbolAVL
+    AplicacionRedSegura ..> FabricaDatos
+    AplicacionRedSegura ..> RepresentacionesGrafo
+    AplicacionRedSegura ..> BusquedaAnchura
+    AplicacionRedSegura ..> BusquedaProfundidad
+    AplicacionRedSegura ..> SolucionDijkstra
+    FabricaDatos ..> GrafoMixto
+    GrafoMixto "1" o-- "*" Vertice
+    GrafoMixto "1" o-- "*" Conexion
+    RepresentacionesGrafo --> GrafoMixto
+    BusquedaAnchura --> GrafoMixto
+    BusquedaProfundidad --> GrafoMixto
+    SolucionDijkstra --> GrafoMixto
+    SolucionDijkstra ..> ResultadoDijkstra
+    ArbolBinarioBusqueda "1" *-- "*" NodoArbol
+    ArbolAVL --|> ArbolBinarioBusqueda
+    ArbolBinarioBusqueda ..> Vertice : T = Vertice
+```
+
 **Orientación:** `GrafoMixto.obtenerVecinos(id)` devuelve las conexiones que se pueden usar saliendo de un vértice. Una conexión dirigida A → B aparece solo en A; una no dirigida A — B aparece en ambos extremos. BFS, DFS y Dijkstra consumen ese método, por lo que respetan la orientación sin repetir lógica.
 
 ## Datos: 12 lugares y 18 conexiones
